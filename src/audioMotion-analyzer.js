@@ -599,6 +599,14 @@ function preCalcPosX() {
   });
 }
 
+let sortedBarHeights = [];
+const cleanUpSortedBarHeights = () =>
+  setInterval(() => {
+    sortedBarHeights = [];
+    console.log('clean');
+  }, 3000);
+cleanUpSortedBarHeights();
+
 /**
  * Redraw the canvas
  * this is called 60 times per second by requestAnimationFrame()
@@ -656,6 +664,23 @@ function draw() {
       bar.peak = barHeight;
       bar.hold = 30; // set peak hold time to 30 frames (0.5s)
       bar.accel = 0;
+    }
+    if (i % 5 == 2) {
+      // console.log({ barHeight, bar, t: typeof bar.peak });
+      if (
+        barHeight > 400 &&
+        barHeight > Math.min(sortedBarHeights.map(h => h.height))
+      ) {
+        const xRatio = bar.posX / canvas.width;
+        sortedBarHeights.push({
+          height: barHeight,
+          f: Math.pow(
+            2,
+            Math.log2(20) + xRatio * (Math.log2(22000) - Math.log2(20)),
+          ),
+        });
+        console.log(sortedBarHeights.map(h => h.f));
+      }
     }
 
     canvasCtx.fillStyle = gradients[gradient].gradient;
